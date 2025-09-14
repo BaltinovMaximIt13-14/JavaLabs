@@ -1,5 +1,4 @@
 import java.text.DecimalFormat;
-import java.lang.Math;
 
 public class Lab1 {
   Validator validator = new Validator();
@@ -40,7 +39,7 @@ public class Lab1 {
           double fractionX = validator.getDouble("Введите вещественное число для нахождения" +
                   " его дробной части (через запятую): ");
           System.out.print("Дробная часть числа " + fractionX + " равна -> ");
-          System.out.println(new DecimalFormat("#.#####").format(fraction(fractionX)));
+          System.out.println(new DecimalFormat("#.############").format(fraction(fractionX)));
           break;
         case 2:
           char digit = validator.getCharInRange("Введите цифру от 1 до 9: ", '1', '9');
@@ -208,10 +207,16 @@ public class Lab1 {
     }
     System.out.print("\n");
   }
+  public double abs(double x) {
+    if (x < 0) {
+      x = -x;
+    }
+    return x;
+  }
 
   //Методы первого номера
   public double fraction(double x) {
-    return Math.abs(x - ((long) x));
+    return abs((double) (x - ((long) x)));
   }
   public int charToNum(char x) {
     return x - '0';
@@ -345,7 +350,7 @@ public class Lab1 {
   public int maxAbs (int[] arr){
     int maxAr = -1000000000;
     for (int i = 0; i < arr.length; i++){
-      if (abs(arr[i]) > maxAr){
+      if (abs(arr[i]) > abs(maxAr)){
         maxAr = arr[i];
       }
     }
