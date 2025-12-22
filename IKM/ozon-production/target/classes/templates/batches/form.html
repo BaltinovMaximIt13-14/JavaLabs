@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--
+  Форма для добавления/редактирования производственных партий
+  @author Baltinov
+  @version 1.0
+  @since 2025
+-->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${batch.batchId != null} ? 'Редактирование партии' : 'Новая партия'"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h2 th:text="${batch.batchId != null} ? '✏️ Редактирование партии' : '➕ Новая партия'"></h2>
+
+    <form th:action="${batch.batchId != null} ?
+                      @{/batches/update/{id}(id=${batch.batchId})} :
+                      @{/batches/save}"
+          method="post" th:object="${batch}">
+
+        <!-- ID партии (скрытое поле для редактирования) -->
+        <div th:if="${batch.batchId != null}" class="mb-3">
+            <label for="batchId" class="form-label">ID партии</label>
+            <input type="text" class="form-control" id="batchId"
+                   th:field="*{batchId}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="productionDate" class="form-label">Дата производства</label>
+            <input type="date" class="form-control" id="productionDate"
+                   th:field="*{productionDate}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="product" class="form-label">Товар</label>
+            <select class="form-control" id="product" th:field="*{product.productSku}" required>
+                <option value="">Выберите товар</option>
+                <option th:each="product : ${products}"
+                        th:value="${product.productSku}"
+                        th:text="${product.productName} + ' (Арт: ' + ${product.productSku} + ')'"
+                        th:selected="${batch.product != null and batch.product.productSku == product.productSku}">
+                </option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="material" class="form-label">Материал</label>
+            <select class="form-control" id="material" th:field="*{material.materialId}" required>
+                <option value="">Выберите материал</option>
+                <option th:each="material : ${materials}"
+                        th:value="${material.materialId}"
+                        th:text="${material.materialType} + ' (' + ${material.materialColor} + ')'"
+                        th:selected="${batch.material != null and batch.material.materialId == material.materialId}">
+                </option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="batchQuantity" class="form-label">Количество в партии</label>
+            <input type="number" class="form-control" id="batchQuantity"
+                   th:field="*{batchQuantity}"
+                   min="1"
+                   max="1000000"
+                   required
+                   oninput="validateNumber(this, 1, 1000000)">
+            <small class="form-text text-muted">От 1 до 1,000,000 единиц</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="materialConsumptionG" class="form-label">Расход материала (г)</label>
+            <!-- ДОБАВЛЕНО: max="1000000" для ограничения больших чисел -->
+            <input type="number" class="form-control" id="materialConsumptionG"
+                   th:field="*{materialConsumptionG}"
+                   min="1"
+                   max="1000000"
+                   required
+                   oninput="validateNumber(this, 1, 1000000)">
+            <small class="form-text text-muted">От 1 до 1,000,000 грамм</small>
+        </div>
+
+        <button type="submit" class="btn btn-success">💾 Сохранить</button>
+        <a href="/batches" class="btn btn-secondary">❌ Отмена</a>
+    </form>
+</div>
+
+<!-- JavaScript для валидации -->
+<script>
+    function validateNumber(input, min, max) {
+        let value = parseInt(input.value);
+
+        if (isNaN(value)) {
+            input.value = min;
+            return;
+        }
+
+        if (value < min) {
+            input.value = min;
+            alert('Значение не может быть меньше ' + min);
+        }
+
+        if (value > max) {
+            input.value = max;
+            alert('Значение не может превышать ' + max);
+        }
+
+        // Ограничиваем длину ввода
+        if (input.value.length > 7) {
+            input.value = input.value.slice(0, 7);
+        }
+    }
+</script>
+</body>
+</html>

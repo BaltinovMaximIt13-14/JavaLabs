@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!--
+  Форма для добавления/редактирования продуктов
+  @author Baltinov
+  @version 1.0
+  @since 2025
+-->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Форма товара</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h2 th:text="${product.productSku != null} ? '✏️ Редактирование товара' : '➕ Новый товар'"></h2>
+
+    <form th:action="${product.productSku != null} ?
+                      @{/products/update/{sku}(sku=${product.productSku})} :
+                      @{/products/save}"
+          method="post" th:object="${product}">
+
+        <div class="mb-3">
+            <label for="productSku" class="form-label">Артикул (SKU)</label>
+            <input type="text" class="form-control" id="productSku"
+                   th:field="*{productSku}"
+                   maxlength="50"
+                   required
+                   th:readonly="${product.productSku != null}"
+                   oninput="validateTextLength(this, 50)">
+            <small class="form-text text-muted">Максимум 50 символов</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="productName" class="form-label">Название товара</label>
+            <input type="text" class="form-control" id="productName"
+                   th:field="*{productName}"
+                   maxlength="200"
+                   required
+                   oninput="validateTextLength(this, 200)">
+            <small class="form-text text-muted">Максимум 200 символов</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="productWeightG" class="form-label">Вес (граммы)</label>
+            <input type="number" class="form-control" id="productWeightG"
+                   th:field="*{productWeightG}"
+                   min="1"
+                   max="100000"
+                   required
+                   oninput="validateNumber(this, 1, 100000)">
+            <small class="form-text text-muted">От 1 до 100,000 грамм</small>
+        </div>
+
+        <button type="submit" class="btn btn-success">💾 Сохранить</button>
+        <a href="/products" class="btn btn-secondary">❌ Отмена</a>
+    </form>
+</div>
+
+<!-- JavaScript для валидации -->
+<script>
+    function validateTextLength(input, maxLength) {
+        if (input.value.length > maxLength) {
+            input.value = input.value.slice(0, maxLength);
+            alert('Максимальная длина: ' + maxLength + ' символов');
+        }
+    }
+
+    function validateNumber(input, min, max) {
+        let value = parseInt(input.value);
+
+        if (isNaN(value)) {
+            input.value = min;
+            return;
+        }
+
+        if (value < min) {
+            input.value = min;
+            alert('Значение не может быть меньше ' + min);
+        }
+
+        if (value > max) {
+            input.value = max;
+            alert('Значение не может превышать ' + max);
+        }
+    }
+</script>
+</body>
+</html>
